@@ -1,0 +1,8 @@
+{
+    "name": "About",
+    "slug": "about",
+    "version": "1.0.0",
+    "author": "Nexpell",
+    "description": "About Us Seiten und Teamvorstellung",
+    "api_version": 1
+}
