@@ -231,15 +231,15 @@ if (!function_exists('about_ensure_website_nav')) {
         global $_database;
 
         $navSubID = 0;
-        $existing = safe_query("SELECT `nav_sub_ID` FROM `navigation_website_sub` WHERE `modulname` = '" . about_sql($modulname) . "' AND `url` = '" . about_sql($url) . "' LIMIT 1");
+        $existing = safe_query("SELECT `snavID` FROM `navigation_website_sub` WHERE `modulname` = '" . about_sql($modulname) . "' AND `url` = '" . about_sql($url) . "' LIMIT 1");
         if ($existing && ($row = mysqli_fetch_assoc($existing))) {
-            $navSubID = (int)$row['nav_sub_ID'];
+            $navSubID = (int)$row['snavID'];
             safe_query("UPDATE `navigation_website_sub` SET
                 `mnavID` = 3,
                 `sort` = " . (int)$sort . ",
                 `indropdown` = 1,
                 `last_modified` = NOW()
-                WHERE `nav_sub_ID` = " . $navSubID);
+                WHERE `snavID` = " . $navSubID);
         } else {
             safe_query("INSERT INTO `navigation_website_sub` (`mnavID`, `modulname`, `url`, `sort`, `indropdown`, `last_modified`)
                 VALUES (3, '" . about_sql($modulname) . "', '" . about_sql($url) . "', " . (int)$sort . ", 1, NOW())");
