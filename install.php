@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('admin')) {
+if (!function_exists('safe_query')) {
     die('Access denied');
 }
 
