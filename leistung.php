@@ -36,7 +36,7 @@ $class = htmlspecialchars((string)($config['selected_style'] ?? ''));
 $dbContent = trim(aboutLeistungValue('leistung_html', $currentLang));
 $pageContent = $dbContent !== ''
     ? $dbContent
-    : '<div class="alert alert-info mb-0">Noch kein Inhalt fuer diese Leistungs-Seite hinterlegt.</div>';
+    : '<div class="alert alert-info mb-0">Noch kein Inhalt für diese Leistungs-Seite hinterlegt.</div>';
 
 echo '<link rel="stylesheet" href="/includes/plugins/about/css/about.css">';
 

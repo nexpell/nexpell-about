@@ -2,7 +2,7 @@
 
 // Sprach-Array für das Plugin 'admin_about'
 $language_array = array(
-    'about_title'        => 'Über us',
+    'about_title'        => 'Über uns',
     'description'        => 'Beschreibung',
     'editor_toggle'      => 'Editor ein-/ausschalten',
     'label_call2action'  => 'Call to action',

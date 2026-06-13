@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 global $plugin;
 
@@ -29,7 +29,7 @@ PluginInstallerHelper::registerAdminNavigation([
     'catID'     => 5,
     'sort'      => 1,
     'labels'    => [
-        'de' => 'Ãœber uns',
+        'de' => 'Über uns',
         'en' => 'About Us',
         'it' => 'Chi siamo'
     ]
