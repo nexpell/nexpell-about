@@ -151,7 +151,7 @@ safe_query("
      'https://www.nexpell.de',
      'about,leistung,info',
      '',
-     '1.0.4',
+     '0.0.0',
      'includes/plugins/about/',
      1,1,1,1,'deactivated'
     )
@@ -190,15 +190,6 @@ safe_query("
         content = VALUES(content),
         modulname = VALUES(modulname),
         updated_at = VALUES(updated_at)
-");
-
-safe_query("
-    UPDATE settings_plugins
-    SET
-        version = '1.0.4',
-        path = 'includes/plugins/about/',
-        activate = 1
-    WHERE modulname = 'about'
 ");
 
 /* ---------------------------
