@@ -2,7 +2,7 @@
 global $str, $modulname, $version, $_database;
 
 $modulname = 'about';
-$version = '1.0.1';
+$version = '1.0.4';
 $str = 'About';
 
 echo "<div class='card'><div class='card-header'>{$str} Database Update</div><div class='card-body'>";
@@ -146,7 +146,7 @@ safe_query("
      'https://www.nexpell.de',
      'about,leistung,info',
      '',
-     '1.0.1',
+     '1.0.4',
      'includes/plugins/about/',
      1,1,1,1,'deactivated'
     )
@@ -171,7 +171,7 @@ safe_query("
 safe_query("
     UPDATE settings_plugins
     SET
-        version = '1.0.1',
+        version = '1.0.4',
         path = 'includes/plugins/about/',
         activate = 1
     WHERE modulname = 'about'
