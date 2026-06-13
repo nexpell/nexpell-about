@@ -36,7 +36,7 @@ if (!function_exists('about_create_content_table')) {
             `id` INT(11) NOT NULL AUTO_INCREMENT,
             `content_key` VARCHAR(80) NOT NULL,
             `language` CHAR(2) NOT NULL DEFAULT 'de',
-            `title` VARCHAR(255) NOT NULL,
+            `title` VARCHAR(255) NOT NULL DEFAULT '',
             `content` MEDIUMTEXT NOT NULL,
             `is_active` TINYINT(1) NOT NULL DEFAULT 1,
             `sort_order` INT(11) NOT NULL DEFAULT 0,
@@ -53,6 +53,7 @@ if (!function_exists('about_migrate_content_table')) {
     function about_migrate_content_table(): void
     {
         about_create_content_table();
+        safe_query("ALTER TABLE `plugins_about` MODIFY `title` VARCHAR(255) NOT NULL DEFAULT ''");
 
         $columnCheck = safe_query("SHOW COLUMNS FROM `plugins_about` LIKE 'content_key'");
         if ($columnCheck && mysqli_num_rows($columnCheck) > 0) {
@@ -136,12 +137,10 @@ if (!function_exists('about_register_plugin')) {
                 `delete_display` = 1,
                 `sidebar` = 'deactivated'
                 WHERE `pluginID` = " . (int)$row['pluginID']);
-            $pluginID = (int)$row['pluginID'];
         } else {
             safe_query("INSERT INTO `settings_plugins`
                 (`modulname`, `admin_file`, `activate`, `author`, `website`, `index_link`, `hiddenfiles`, `version`, `path`, `status_display`, `plugin_display`, `widget_display`, `delete_display`, `sidebar`)
                 VALUES ('about', 'admin/about.php', 1, 'Nexpell', 'https://www.nexpell.de', 'about,leistung,info', '', '" . about_sql($version) . "', '" . about_sql($pluginPath) . "', 1, 1, 1, 1, 'deactivated')");
-            $pluginID = (int)mysqli_insert_id($_database);
         }
 
         $labels = [
@@ -151,35 +150,41 @@ if (!function_exists('about_register_plugin')) {
         ];
 
         foreach ($labels as $lang => $name) {
-            safe_query("INSERT INTO `settings_plugins_lang` (`pluginID`, `modulname`, `language`, `name`, `description`)
-                VALUES (" . $pluginID . ", 'about', '" . about_sql($lang) . "', '" . about_sql($name) . "', '')
+            safe_query("INSERT INTO `settings_plugins_lang` (`content_key`, `language`, `content`, `modulname`, `updated_at`)
+                VALUES ('plugin_name_about', '" . about_sql($lang) . "', '" . about_sql($name) . "', 'about', NOW())
                 ON DUPLICATE KEY UPDATE
-                    `pluginID` = VALUES(`pluginID`),
-                    `name` = VALUES(`name`),
-                    `description` = VALUES(`description`)");
+                    `content` = VALUES(`content`),
+                    `modulname` = VALUES(`modulname`),
+                    `updated_at` = VALUES(`updated_at`)");
+
+            safe_query("INSERT INTO `settings_plugins_lang` (`content_key`, `language`, `content`, `modulname`, `updated_at`)
+                VALUES ('plugin_info_about', '" . about_sql($lang) . "', '', 'about', NOW())
+                ON DUPLICATE KEY UPDATE
+                    `content` = VALUES(`content`),
+                    `modulname` = VALUES(`modulname`),
+                    `updated_at` = VALUES(`updated_at`)");
         }
     }
 }
-
 if (!function_exists('about_upsert_dashboard_lang')) {
     function about_upsert_dashboard_lang(int $linkID): void
     {
         $labels = [
-            'de' => ['About', 'About verwalten'],
-            'en' => ['About', 'Manage about page'],
-            'it' => ['About', 'Gestisci pagina about'],
+            'de' => 'About',
+            'en' => 'About',
+            'it' => 'About',
         ];
 
         foreach ($labels as $lang => $label) {
-            safe_query("INSERT INTO `navigation_dashboard_links_lang` (`linkID`, `modulname`, `language`, `name`, `description`)
-                VALUES (" . $linkID . ", 'about', '" . about_sql($lang) . "', '" . about_sql($label[0]) . "', '" . about_sql($label[1]) . "')
+            safe_query("INSERT INTO `navigation_dashboard_lang` (`content_key`, `language`, `content`, `modulname`, `updated_at`)
+                VALUES ('nav_link_" . $linkID . "', '" . about_sql($lang) . "', '" . about_sql($label) . "', 'about', NOW())
                 ON DUPLICATE KEY UPDATE
-                    `name` = VALUES(`name`),
-                    `description` = VALUES(`description`)");
+                    `content` = VALUES(`content`),
+                    `modulname` = VALUES(`modulname`),
+                    `updated_at` = VALUES(`updated_at`)");
         }
     }
 }
-
 if (!function_exists('about_ensure_dashboard_nav')) {
     function about_ensure_dashboard_nav(): void
     {
@@ -211,16 +216,15 @@ if (!function_exists('about_upsert_website_lang')) {
     function about_upsert_website_lang(int $navSubID, string $modulname, array $labels): void
     {
         foreach ($labels as $lang => $label) {
-            safe_query("INSERT INTO `navigation_website_lang` (`content_key`, `modulname`, `language`, `name`, `description`)
-                VALUES (" . $navSubID . ", '" . about_sql($modulname) . "', '" . about_sql($lang) . "', '" . about_sql($label) . "', '')
+            safe_query("INSERT INTO `navigation_website_lang` (`content_key`, `language`, `content`, `modulname`, `updated_at`)
+                VALUES ('nav_sub_" . $navSubID . "', '" . about_sql($lang) . "', '" . about_sql($label) . "', '" . about_sql($modulname) . "', NOW())
                 ON DUPLICATE KEY UPDATE
+                    `content` = VALUES(`content`),
                     `modulname` = VALUES(`modulname`),
-                    `name` = VALUES(`name`),
-                    `description` = VALUES(`description`)");
+                    `updated_at` = VALUES(`updated_at`)");
         }
     }
 }
-
 if (!function_exists('about_ensure_website_nav')) {
     function about_ensure_website_nav(string $modulname, string $url, int $sort, array $labels): void
     {
