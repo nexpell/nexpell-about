@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 global $plugin;
 
@@ -10,7 +10,7 @@ PluginInstallerHelper::registerPlugin([
     'path'           => 'includes/plugins/about/',
     'author'         => 'Nexpell',
     'website'        => 'https://www.nexpell.de',
-    'index_link'     => 'about',
+    'index_link'     => 'about,info,leistung',
     'hiddenfiles'    => '',
     'sidebar'        => 'deactivated'
 ]);
@@ -21,7 +21,7 @@ PluginInstallerHelper::registerAdminNavigation([
     'catID'     => 5,
     'sort'      => 1,
     'labels'    => [
-        'de' => 'Über uns',
+        'de' => 'Ãœber uns',
         'en' => 'About Us',
         'it' => 'Chi siamo'
     ]
@@ -33,9 +33,33 @@ PluginInstallerHelper::registerWebsiteNavigation([
     'mnavID'    => 2,
     'sort'      => 1,
     'labels'    => [
-        'de' => 'Über uns',
+        'de' => 'Ãœber uns',
         'en' => 'About Us',
         'it' => 'Chi siamo'
+    ]
+]);
+
+PluginInstallerHelper::registerWebsiteNavigation([
+    'modulname' => 'leistung',
+    'url'       => 'index.php?site=leistung',
+    'mnavID'    => 2,
+    'sort'      => 2,
+    'labels'    => [
+        'de' => 'Leistung',
+        'en' => 'Services',
+        'it' => 'Servizi'
+    ]
+]);
+
+PluginInstallerHelper::registerWebsiteNavigation([
+    'modulname' => 'info',
+    'url'       => 'index.php?site=info',
+    'mnavID'    => 2,
+    'sort'      => 3,
+    'labels'    => [
+        'de' => 'Info',
+        'en' => 'Info',
+        'it' => 'Info'
     ]
 ]);
 
@@ -85,7 +109,7 @@ CREATE TABLE IF NOT EXISTS plugins_about (
 
     safe_query("
     INSERT IGNORE INTO plugins_about (content_key, language, content, updated_at) VALUES
-    ('title','de','Über uns',NOW()),
+    ('title','de','Ãœber uns',NOW()),
     ('title','en','About us',NOW()),
     ('title','it','Chi siamo',NOW()),
     ('intro','de','Willkommen auf unserer Website.',NOW()),
@@ -111,6 +135,12 @@ CREATE TABLE IF NOT EXISTS plugins_about (
     ('image2','it','history.jpg',NOW()),
     ('image3','de','team.jpg',NOW()),
     ('image3','en','team.jpg',NOW()),
-    ('image3','it','team.jpg',NOW())
+    ('image3','it','team.jpg',NOW()),
+    ('info_html','de','<p>Hier findest du weitere Informationen zu unserer Community.</p>',NOW()),
+    ('info_html','en','<p>Here you can find more information about our community.</p>',NOW()),
+    ('info_html','it','<p>Qui trovi ulteriori informazioni sulla nostra community.</p>',NOW()),
+    ('leistung_html','de','<p>Hier findest du unsere Leistungen und Angebote.</p>',NOW()),
+    ('leistung_html','en','<p>Here you can find our services and offers.</p>',NOW()),
+    ('leistung_html','it','<p>Qui trovi i nostri servizi e le nostre offerte.</p>',NOW())
     ");
 
