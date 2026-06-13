@@ -41,7 +41,7 @@ PluginInstallerHelper::registerWebsiteNavigation([
     'mnavID'    => 2,
     'sort'      => 1,
     'labels'    => [
-        'de' => 'Ãœber uns',
+        'de' => 'Über uns',
         'en' => 'About Us',
         'it' => 'Chi siamo'
     ]
@@ -140,7 +140,7 @@ if (!function_exists('about_upsert_website_nav')) {
 }
 
 about_upsert_website_nav('about', 'index.php?site=about', 2, 1, [
-    'de' => 'Ueber uns',
+    'de' => 'Über uns',
     'en' => 'About Us',
     'it' => 'Chi siamo'
 ]);
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS plugins_about (
 
     safe_query("
     INSERT IGNORE INTO plugins_about (content_key, language, content, updated_at) VALUES
-    ('title','de','Ãœber uns',NOW()),
+    ('title','de','Über uns',NOW()),
     ('title','en','About us',NOW()),
     ('title','it','Chi siamo',NOW()),
     ('intro','de','Willkommen auf unserer Website.',NOW()),
