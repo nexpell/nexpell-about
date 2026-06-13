@@ -196,13 +196,12 @@ if (!function_exists('about_ensure_dashboard_nav')) {
             $linkID = (int)$row['linkID'];
             safe_query("UPDATE `navigation_dashboard_links` SET
                 `catID` = 3,
-                `name` = 'About',
                 `url` = 'admincenter.php?site=admin_about',
                 `sort` = 20
                 WHERE `linkID` = " . $linkID);
         } else {
-            safe_query("INSERT INTO `navigation_dashboard_links` (`catID`, `modulname`, `name`, `url`, `sort`)
-                VALUES (3, 'about', 'About', 'admincenter.php?site=admin_about', 20)");
+            safe_query("INSERT INTO `navigation_dashboard_links` (`catID`, `modulname`, `url`, `sort`)
+                VALUES (3, 'about', 'admincenter.php?site=admin_about', 20)");
             $linkID = (int)mysqli_insert_id($_database);
         }
 
@@ -211,7 +210,6 @@ if (!function_exists('about_ensure_dashboard_nav')) {
         }
     }
 }
-
 if (!function_exists('about_upsert_website_lang')) {
     function about_upsert_website_lang(int $navSubID, string $modulname, array $labels): void
     {
