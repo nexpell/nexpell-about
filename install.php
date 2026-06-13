@@ -251,70 +251,10 @@ if (!function_exists('about_ensure_website_nav')) {
 }
 
 
-if (!function_exists('about_track_installation')) {
-    function about_track_installation(string $version): void
-    {
-        $columns = [];
-        $resCols = safe_query("SHOW COLUMNS FROM `settings_plugins_installed`");
-        while ($resCols && ($col = mysqli_fetch_assoc($resCols))) {
-            $columns[] = (string)$col['Field'];
-        }
-
-        if (!in_array('modulname', $columns, true)) {
-            return;
-        }
-
-        $data = [
-            'name' => 'About',
-            'modulname' => 'about',
-            'description' => 'About plugin',
-            'version' => $version,
-            'author' => 'Nexpell',
-            'url' => 'https://www.nexpell.de',
-            'folder' => 'about',
-            'installed_date' => '__NOW__',
-        ];
-
-        $existing = safe_query("SELECT `id` FROM `settings_plugins_installed` WHERE `modulname` = 'about' ORDER BY `id` ASC LIMIT 1");
-        $row = $existing ? mysqli_fetch_assoc($existing) : null;
-
-        if ($row && isset($row['id'])) {
-            $sets = [];
-            foreach ($data as $column => $value) {
-                if ($column === 'modulname' || !in_array($column, $columns, true)) {
-                    continue;
-                }
-                $sets[] = $column === 'installed_date'
-                    ? "`installed_date` = NOW()"
-                    : "`" . $column . "` = '" . about_sql($value) . "'";
-            }
-
-            if (!empty($sets)) {
-                safe_query("UPDATE `settings_plugins_installed` SET " . implode(', ', $sets) . " WHERE `id` = " . (int)$row['id']);
-            }
-            return;
-        }
-
-        $insertColumns = [];
-        $insertValues = [];
-        foreach ($data as $column => $value) {
-            if (!in_array($column, $columns, true)) {
-                continue;
-            }
-            $insertColumns[] = "`" . $column . "`";
-            $insertValues[] = $column === 'installed_date' ? 'NOW()' : "'" . about_sql($value) . "'";
-        }
-
-        if (!empty($insertColumns)) {
-            safe_query("INSERT INTO `settings_plugins_installed` (" . implode(', ', $insertColumns) . ") VALUES (" . implode(', ', $insertValues) . ")");
-        }
-    }
-}
 about_migrate_content_table();
 about_seed_content();
 about_register_plugin($version, $pluginPath);
 about_ensure_dashboard_nav();
-about_track_installation($version);
 
 about_ensure_website_nav('about', 'index.php?site=about', 1, [
     'de' => 'Ueber uns',
