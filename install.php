@@ -2,16 +2,18 @@
 
 global $plugin;
 
-$config = [
-    'modulname' => 'about',
-    'name'      => 'About',
-    'version'   => (string)($plugin['version'] ?? '0.0.0'),
-    'path'      => 'includes/plugins/about/',
-    'author'    => 'Nexpell',
-    'website'   => 'https://www.nexpell.de',
-];
-
-PluginInstallerHelper::registerPlugin($config);
+PluginInstallerHelper::registerPlugin([
+    'modulname'      => 'about',
+    'name'           => 'About',
+    'version'        => (string)($plugin['version'] ?? '0.0.0'),
+    'admin_file'     => 'admin_about',
+    'path'           => 'includes/plugins/about/',
+    'author'         => 'Nexpell',
+    'website'        => 'https://www.nexpell.de',
+    'index_link'     => 'about',
+    'hiddenfiles'    => '',
+    'sidebar'        => 'deactivated'
+]);
 
 PluginInstallerHelper::registerAdminNavigation([
     'modulname' => 'about',
