@@ -1,50 +1,63 @@
 <?php
 
+if (!function_exists('safe_query')) {
+    die('Access denied');
+}
+
 global $plugin;
 
-PluginInstallerHelper::registerPlugin([
-    'modulname'      => 'about',
-    'name'           => 'About',
-    'version'        => (string)($plugin['version'] ?? '0.0.0'),
-    'admin_file'     => 'admin_about',
-    'path'           => 'includes/plugins/about/',
-    'author'         => 'Nexpell',
-    'website'        => 'https://www.nexpell.de',
-    'index_link'     => 'about,info,leistung',
-    'hiddenfiles'    => '',
-    'sidebar'        => 'deactivated'
-]);
+PluginInstallerHelper::install([
 
-safe_query("
-    UPDATE settings_plugins
-    SET index_link = 'about,info,leistung',
-        admin_file = 'admin_about',
-        path = 'includes/plugins/about/'
-    WHERE modulname = 'about'
-");
+    'modulname'  => 'about',
+    'name'       => 'About',
+    'version'    => (string)($plugin['version'] ?? '0.0.0'),
+    'author'     => 'Nexpell',
+    'website'    => 'https://www.nexpell.de',
+    'path'       => 'includes/plugins/about/',
 
-PluginInstallerHelper::registerAdminNavigation([
-    'modulname' => 'about',
-    'url'       => 'admincenter.php?site=admin_about',
-    'catID'     => 5,
-    'sort'      => 1,
-    'labels'    => [
-        'de' => 'Über uns',
-        'en' => 'About Us',
-        'it' => 'Chi siamo'
+    'admin_file' => 'admin_about',
+    'index_link' => 'about,info,leistung',
+    'sidebar'    => 'deactivated',
+
+    'languages' => [
+        'plugin_info_about' => [
+            'de' => 'Mit diesem Plugin könnt ihr eure Über-uns-, Info- und Leistungsseiten verwalten.',
+            'en' => 'With this plugin you can manage your about, info, and services pages.',
+            'it' => 'Con questo plugin puoi gestire le pagine chi siamo, informazioni e servizi.'
+        ]
+    ],
+
+    'permissions' => [
+        'about'
+    ],
+
+    'admin_navigation' => [
+        [
+            'url'   => 'admincenter.php?site=admin_about',
+            'catID' => 5,
+            'sort'  => 1,
+            'labels' => [
+                'de' => 'Über uns',
+                'en' => 'About Us',
+                'it' => 'Chi siamo'
+            ]
+        ]
+    ],
+
+    'website_navigation' => [
+        [
+            'url'        => 'index.php?site=about',
+            'mnavID'     => 2,
+            'sort'       => 1,
+            'indropdown' => 1,
+            'labels' => [
+                'de' => 'Über uns',
+                'en' => 'About Us',
+                'it' => 'Chi siamo'
+            ]
+        ]
     ]
-]);
 
-PluginInstallerHelper::registerWebsiteNavigation([
-    'modulname' => 'about',
-    'url'       => 'index.php?site=about',
-    'mnavID'    => 2,
-    'sort'      => 1,
-    'labels'    => [
-        'de' => 'Über uns',
-        'en' => 'About Us',
-        'it' => 'Chi siamo'
-    ]
 ]);
 
 PluginInstallerHelper::registerWebsiteNavigation([
@@ -71,119 +84,6 @@ PluginInstallerHelper::registerWebsiteNavigation([
     ]
 ]);
 
-if (!function_exists('about_upsert_website_nav')) {
-    function about_upsert_website_nav(string $modulname, string $url, int $mnavID, int $sort, array $labels): void
-    {
-        global $_database;
-
-        $mod = escape($modulname);
-        $navUrl = escape($url);
-
-        $res = safe_query("
-            SELECT snavID
-            FROM navigation_website_sub
-            WHERE modulname = '$mod'
-              AND url = '$navUrl'
-            LIMIT 1
-        ");
-        $row = $res ? mysqli_fetch_assoc($res) : null;
-        $snavID = (int)($row['snavID'] ?? 0);
-
-        if ($snavID > 0) {
-            safe_query("
-                UPDATE navigation_website_sub
-                SET mnavID = $mnavID,
-                    sort = $sort,
-                    indropdown = 1,
-                    last_modified = NOW()
-                WHERE snavID = $snavID
-            ");
-        } else {
-            safe_query("
-                INSERT INTO navigation_website_sub
-                    (mnavID, modulname, url, sort, indropdown, last_modified)
-                VALUES
-                    ($mnavID, '$mod', '$navUrl', $sort, 1, NOW())
-            ");
-            $snavID = (int)mysqli_insert_id($_database);
-        }
-
-        if ($snavID <= 0) {
-            $res = safe_query("
-                SELECT snavID
-                FROM navigation_website_sub
-                WHERE modulname = '$mod'
-                  AND url = '$navUrl'
-                LIMIT 1
-            ");
-            $row = $res ? mysqli_fetch_assoc($res) : null;
-            $snavID = (int)($row['snavID'] ?? 0);
-        }
-
-        if ($snavID <= 0) {
-            return;
-        }
-
-        foreach ($labels as $lang => $label) {
-            safe_query("
-                INSERT INTO navigation_website_lang
-                    (content_key, language, content, modulname, updated_at)
-                VALUES
-                    ('nav_sub_$snavID', '" . escape((string)$lang) . "', '" . escape((string)$label) . "', '$mod', NOW())
-                ON DUPLICATE KEY UPDATE
-                    content = VALUES(content),
-                    modulname = VALUES(modulname),
-                    updated_at = NOW()
-            ");
-        }
-    }
-}
-
-about_upsert_website_nav('about', 'index.php?site=about', 2, 1, [
-    'de' => 'Über uns',
-    'en' => 'About Us',
-    'it' => 'Chi siamo'
-]);
-
-about_upsert_website_nav('leistung', 'index.php?site=leistung', 2, 2, [
-    'de' => 'Leistung',
-    'en' => 'Services',
-    'it' => 'Servizi'
-]);
-
-about_upsert_website_nav('info', 'index.php?site=info', 2, 3, [
-    'de' => 'Info',
-    'en' => 'Info',
-    'it' => 'Info'
-]);
-
-PluginInstallerHelper::registerAdminRight('about');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =========================================================
-   ABOUT PLUGIN - INSTALL / REPAIR
-   SAFE & IDEMPOTENT
-========================================================= */
-
-/* ---------------------------
-   CONTENT TABLE (rules-style)
----------------------------- */
 safe_query("
 CREATE TABLE IF NOT EXISTS plugins_about (
   id INT(11) NOT NULL AUTO_INCREMENT,
@@ -200,8 +100,7 @@ CREATE TABLE IF NOT EXISTS plugins_about (
   COLLATE=utf8mb4_unicode_ci
 ");
 
-
-    safe_query("
+safe_query("
     INSERT IGNORE INTO plugins_about (content_key, language, content, updated_at) VALUES
     ('title','de','Über uns',NOW()),
     ('title','en','About us',NOW()),
@@ -236,4 +135,4 @@ CREATE TABLE IF NOT EXISTS plugins_about (
     ('leistung_html','de','<p>Hier findest du unsere Leistungen und Angebote.</p>',NOW()),
     ('leistung_html','en','<p>Here you can find our services and offers.</p>',NOW()),
     ('leistung_html','it','<p>Qui trovi i nostri servizi e le nostre offerte.</p>',NOW())
-    ");
+");

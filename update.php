@@ -4,15 +4,11 @@ if (!function_exists('safe_query')) {
     die('Access denied');
 }
 
-global $str, $modulname, $version, $plugin;
+global $_database, $modulname, $version, $plugin;
 
 $modulname = 'about';
 $version = isset($plugin['version']) ? (string)$plugin['version'] : ($version ?? '0.0.0');
 $str = 'About';
 
-echo '<div class="card"><div class="card-body">';
-echo '<h4>Update: ' . htmlspecialchars($str, ENT_QUOTES, 'UTF-8') . ' (' . htmlspecialchars($version, ENT_QUOTES, 'UTF-8') . ')</h4>';
-
 require __DIR__ . '/install.php';
 
-echo '</div></div>';
